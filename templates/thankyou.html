@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif, Verdana, sans-serif;
+            background-image: url("{{ url_for('static', filename='images/remedy7.png') }}");
+            background-size: cover;
+        }
+        .thankyou-container {
+            text-align: center;
+            padding: 50px;
+            background-color: rgb(199, 120, 36);
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #392609; /* Dark brown color */
+            border-color: #4b3d3d; /* Ensure the border matches the background */
+            color: rgb(252, 251, 250); /* Text color */
+            margin-top: 15px;
+        }
+        .btn-primary:hover {
+            background-color: #f1b340; /* Darker shade for hover effect */
+            border-color: #3e2e2e; /* Ensure the border matches the background */
+            color: rgb(13, 13, 12); /* Text color */
+        }
+        .btn-home {
+            margin-top: 15px; /* Add space between buttons */
+        }
+    </style>
+</head>
+<body>
+    <div class="thankyou-container">
+        <h1>Thank You!</h1>
+        <p>Thank you for visiting HairCare. We hope to see you again soon!</p>
+        <a href="/login" class="btn btn-primary">Return to Login</a>
+        <a href="/Home" class="btn btn-primary btn-home">Home</a> <!-- Home Button -->
+    </div>
+</body>
+</html>

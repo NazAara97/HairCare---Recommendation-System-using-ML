@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Profiles</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Verdana, sans-serif;
+            background-image: url("{{ url_for('static', filename='images/remedy7.png') }}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            padding: 20px;
+            color: rgb(92, 10, 10);
+        }
+        h1 {
+            color: #5a0a0a;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .doctor-list {
+            list-style: none;
+            padding: 0;
+            color: #6e1010;
+        }
+        .doctor-list li {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        .doctor-list a {
+            color: #421304;
+            text-decoration: none;
+        }
+        .doctor-list a:hover {
+            text-decoration: underline;
+            color: rgb(173, 17, 9);
+        }
+        .doctor-profile {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: none; /* Initially hidden */
+        }
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .contact-info {
+            margin-top: 10px;
+        }
+        .contact-info p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Our Health Experts</h1>
+    <ul class="doctor-list">
+        <!-- Each doctor's name is a link -->
+        <li><a href="#" onclick="showProfile('DrEmilyStone')">Dr. Emily Stone, Trichologist (PhD)</a></li>
+        <li><a href="#" onclick="showProfile('DrRajPatel')">Dr. Raj Patel, Dermatologist (MD)</a></li>
+        <li><a href="#" onclick="showProfile('DrSarahLee')">Dr. Sarah Lee, Holistic Medicine (ND)</a></li>
+        <li><a href="#" onclick="showProfile('DrMichaelChen')">Dr. Michael Chen, Dermatologist (MD)</a></li>
+        <li><a href="#" onclick="showProfile('DrAishaKhan')">Dr. Aisha Khan, Ayurveda Specialist (BAMS)</a></li>
+        <li><a href="#" onclick="showProfile('DrJuanMartinez')">Dr. Juan Martinez, Homeopathy (BHMS)</a></li>
+        <li><a href="#" onclick="showProfile('DrLindaWong')">Dr. Linda Wong, Alternative Medicine (ND)</a></li>
+        <li><a href="#" onclick="showProfile('DrPriyaVerma')">Dr. Priya Verma, Dermatologist (MD)</a></li>
+        <li><a href="#" onclick="showProfile('DrJamesBrown')">Dr. James Brown, Trichologist (PhD)</a></li>
+        <li><a href="#" onclick="showProfile('DrSofiaGarcia')">Dr. Sofia Garcia, Holistic Medicine (ND)</a></li>
+    </ul>
+
+    <!-- Doctor profile display section -->
+    <div id="doctorProfile" class="doctor-profile">
+        <img id="profilePic" src="" alt="Profile Picture" class="profile-pic">
+        <h2 id="doctorName"></h2>
+        <p id="qualification"></p>
+        
+        <div class="contact-info">
+            <p><strong>Contact Number:</strong> <span id="contactNumber"></span></p>
+            <p><strong>Email:</strong> <span id="email"></span></p>
+            <p><strong>LinkedIn:</strong> <a id="linkedin" href="#" target="_blank">View link</a></p>
+            <p><strong>Facebook:</strong> <a id="facebook" href="#" target="_blank">View link</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Doctor data
+        const doctorData = {
+            DrEmilyStone: {
+                name: "Dr. Emily Stone",
+                qualification: "Trichologist (PhD)",
+                profilePic: "FYP/Project HairCAre/fpy/FRONT END/istockphoto-476209306-612x612.jpg",
+                contactNumber: "077-833-6601",
+                email: "emily.stone@gmail.com",
+                linkedin: "https://linkedin.com/in/emily-stone",
+                facebook: "https://facebook.com/emily.stone"
+            },
+            DrRajPatel: {
+                name: "Dr. Raj Patel",
+                qualification: "Dermatologist (MD)",
+                profilePic: "FYP/Project HairCAre/fpy/FRONT END/istockphoto-525675469-612x612.jpg",
+                contactNumber: "071-425-6354",
+                email: "raj.patel@gmail.com",
+                linkedin: "https://linkedin.com/in/raj-patel",
+                facebook: "https://facebook.com/raj.patel"
+            },
+            DrSarahLee: {
+                name: "Dr. Sarah Lee",
+                qualification: "Holistic Medicine (ND)",
+                profilePic: "FYP/Project HairCAre/fpy/FRONT END/istockphoto-476561357-612x612.jpg",
+                contactNumber: "075-456-7892",
+                email: "sarah.lee@gmail.com",
+                linkedin: "https://linkedin.com/in/sarah-lee",
+                facebook: "https://facebook.com/sarah.lee"
+            },
+            DrMichaelChen: {
+                name: "Dr. Michael Chen",
+                qualification: "Dermatologist (MD)",
+                profilePic: "FYP/Project HairCAre/fpy/FRONT END/istockphoto-146746271-612x612.jpg",
+                contactNumber: "076-456-7893",
+                email: "michael.chen@gmail.com",
+                linkedin: "https://linkedin.com/in/michael-chen",
+                facebook: "https://facebook.com/michael.chen"
+            },
+            DrAishaKhan: {
+                name: "Dr. Aisha Khan",
+                qualification: "Ayurveda Specialist (BAMS)",
+                profilePic: "FYP/Project HairCAre/fpy/FRONT END/istockphoto-625069380-612x612.jpg",
+                contactNumber: "011-456-7894",
+                email: "aisha.khan@gmail.com",
+                linkedin: "https://linkedin.com/in/aisha-khan",
+                facebook: "https://facebook.com/aisha.khan"
+            },
+            DrJuanMartinez: {
+                name: "Dr. Juan Martinez",
+                qualification: "Homeopathy (BHMS)",
+                profilePic: "FYP/Project HairCAre/fpy/FRONT END/istockphoto-855467392-612x612.jpg",
+                contactNumber: "077-456-7895",
+                email: "juan.martinez@gmail.com",
+                linkedin: "https://linkedin.com/in/juan-martinez",
+                facebook: "https://facebook.com/juan.martinez"
+            },
+            DrLindaWong: {
+                name: "Dr. Linda Wong",
+                qualification: "Alternative Medicine (ND)",
+                profilePic: "FYP/Project HairCAre/fpy/FRONT END/istockphoto-1065764548-612x612.jpg",
+                contactNumber: "077-456-7896",
+                email: "linda.wong@gmail.com",
+                linkedin: "https://linkedin.com/in/linda-wong",
+                facebook: "https://facebook.com/linda.wong"
+            },
+            DrPriyaVerma: {
+                name: "Dr. Priya Verma",
+                qualification: "Dermatologist (MD)",
+                profilePic: "FYP/Project HairCAre/fpy/FRONT END/istockphoto-1328843526-612x612.jpg",
+                contactNumber: "074-456-7897",
+                email: "priya.verma@gmail.com",
+                linkedin: "https://linkedin.com/in/priya-verma",
+                facebook: "https://facebook.com/priya.verma"
+            },
+            DrJamesBrown: {
+                name: "Dr. James Brown",
+                qualification: "Trichologist (PhD)",
+                profilePic: "FYP/Project HairCAre/fpy/FRONT END/istockphoto-1161326236-612x612.jpg",
+                contactNumber: "077-456-7898",
+                email: "james.brown@gmail.com",
+                linkedin: "https://linkedin.com/in/james-brown",
+                facebook: "https://facebook.com/james.brown"
+            },
+            DrSofiaGarcia: {
+                name: "Dr. Sofia Garcia",
+                qualification: "Holistic Medicine (ND)",
+                profilePic: "FYP/Project HairCAre/fpy/FRONT END/file-20191203-66986-im7o5.avif",
+                contactNumber: "071-456-7899",
+                email: "sofia.garcia@gmail.com",
+                linkedin: "https://linkedin.com/in/sofia-garcia",
+                facebook: "https://facebook.com/sofia.garcia"
+            }
+        };
+
+
+        // Function to show doctor's profile
+        function showProfile(doctorId) {
+            const doctor = doctorData[doctorId];
+            
+            if (doctor) {
+                // Update profile content
+                document.getElementById("profilePic").src = doctor.profilePic;
+                document.getElementById("doctorName").innerText = doctor.name;
+                document.getElementById("qualification").innerText = doctor.qualification;
+                document.getElementById("contactNumber").innerText = doctor.contactNumber;
+                document.getElementById("email").innerText = doctor.email;
+                document.getElementById("linkedin").href = doctor.linkedin;
+                document.getElementById("facebook").href = doctor.facebook;
+
+                // Display the profile section
+                document.getElementById("doctorProfile").style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>

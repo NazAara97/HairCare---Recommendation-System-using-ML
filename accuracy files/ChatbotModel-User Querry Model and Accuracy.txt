@@ -1,0 +1,141 @@
+
+
+!pip install pandas scikit-learn nltk
+
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.neighbors import NearestNeighbors
+from sklearn.decomposition import TruncatedSVD
+import string
+import nltk
+from nltk.corpus import stopwords
+import pickle
+from sklearn.metrics import precision_score, recall_score
+
+# Download stopwords
+nltk.download('stopwords')
+
+def clean_text(text):
+    """Cleans text by removing punctuation, stopwords, and converting to lowercase."""
+    text = text.lower()
+    text = text.translate(str.maketrans('', '', string.punctuation))
+    stop_words = set(stopwords.words('english'))
+    text = ' '.join([word for word in text.split() if word not in stop_words])
+    return text
+
+# Load dataset
+file_path = '/content/dataset1.csv'  # Update path
+
+df = pd.read_csv(file_path)
+
+df['Cleaned_Combined'] = df['User Query'] + " " + df['Chatbot Response'] + " " + df['Process']
+df['Cleaned_Combined'] = df['Cleaned_Combined'].apply(clean_text)
+
+# TF-IDF Vectorization
+tfidf_vectorizer = TfidfVectorizer(max_features=5000, ngram_range=(1, 3))
+X = tfidf_vectorizer.fit_transform(df['Cleaned_Combined'])
+
+# Apply Latent Semantic Analysis (LSA)
+lsa = TruncatedSVD(n_components=100, random_state=42)
+X_lsa = lsa.fit_transform(X)
+
+# Train Nearest Neighbors Model
+model = NearestNeighbors(n_neighbors=10, metric='cosine')
+model.fit(X_lsa)
+
+# Save model and vectorizer
+with open('/content/lsa_chatbot_model.pkl', 'wb') as model_file:
+    pickle.dump(model, model_file)
+
+with open('/content/tfidf_vectorizer.pkl', 'wb') as vectorizer_file:
+    pickle.dump(tfidf_vectorizer, vectorizer_file)
+
+with open('/content/lsa_transformer.pkl', 'wb') as lsa_file:
+    pickle.dump(lsa, lsa_file)
+
+def recommend_top_10_queries(query):
+    """Recommend the top 10 chatbot responses based on user query."""
+    query_vec = tfidf_vectorizer.transform([clean_text(query)])
+    query_lsa = lsa.transform(query_vec)
+    distances, indices = model.kneighbors(query_lsa, n_neighbors=10)
+    recommendations = df.iloc[indices[0]]
+    
+    result = []
+    similarity_scores = []
+    for i, (row, dist) in enumerate(zip(recommendations.iterrows(), distances[0])):
+        recommendation = row[1]
+        result.append({
+            'Recommendation #': i + 1,
+            'User Query': recommendation['User Query'],
+            'Chatbot Response': recommendation['Chatbot Response'],
+            'Doctor Name with Qualification': recommendation['Doctor Name with Qualification'],
+            'Process': recommendation['Process'],
+            'Similarity Score': 1 - dist
+        })
+        similarity_scores.append(1 - dist)
+
+    result_sorted = sorted(result, key=lambda x: x['Similarity Score'], reverse=True)
+    return result_sorted, similarity_scores
+
+# Example query
+test_query = "How can I reduce dandruff?"
+recommendations, _ = recommend_top_10_queries(test_query)
+
+print("Top 10 Recommendations:")
+for recommendation in recommendations:
+    print(f"Recommendation {recommendation['Recommendation #']}:")
+    print(f"  User Query: {recommendation['User Query']}")
+    print(f"  Chatbot Response: {recommendation['Chatbot Response']}")
+    print(f"  Doctor Name with Qualification: {recommendation['Doctor Name with Qualification']}")
+    print(f"  Process: {recommendation['Process']}")
+    print(f"  Similarity Score: {recommendation['Similarity Score']:.4f}\n")
+
+# Calculate Precision and Recall
+true_labels = [1 if "dandruff" in query.lower() else 0 for query in df['User Query']]
+# Get predictions for the entire dataset
+pred_labels = [1 if any("dandruff" in rec['User Query'].lower() 
+                         for rec in recommend_top_10_queries(query)[0]) 
+              else 0 for query in df['User Query']]  
+
+precision = precision_score(true_labels, pred_labels, zero_division=1)
+recall = recall_score(true_labels, pred_labels, zero_division=1)
+
+print(f"Precision: {precision:.4f}")
+print(f"Recall: {recall:.4f}")
+
+# Define test set
+test_set = [
+    {'user_query': "What can I do to stop my hair from thinning?", 'actual_indices': [5,6,7,8,9]},
+   {'user_query': "What can I do to stop my hair from dandruff?", 'actual_indices': [11,13]},
+    {'user_query': "What can I do to stop my hair from frizz?", 'actual_indices': [20]},
+]
+
+correct_user_count = 0
+incorrect_user_count = 0
+y_true = []  # Actual (ground truth)
+y_pred = []  # Model predictions
+
+for data in test_set:
+    user_query = data['user_query']
+    actual_indices = set(data['actual_indices'])
+    # Get the list of recommendations from the tuple returned by recommend_top_10_queries
+    recommendations, _ = recommend_top_10_queries(user_query)  
+    predicted_indices = set([recommendation['Recommendation #'] - 1 for recommendation in recommendations])
+    correct = actual_indices.issubset(predicted_indices)
+    if correct:
+        correct_user_count += 1
+    else:
+        incorrect_user_count += 1
+    for i in range(len(df)):
+        y_true.append(1 if i in actual_indices else 0)
+        y_pred.append(1 if i in predicted_indices else 0)
+# Calculate accuracy
+accuracy = correct_user_count / (correct_user_count + incorrect_user_count)
+print(f"Accuracy: {accuracy * 100:.2f}%")
+
+# Calculate precision and recall
+precision = precision_score(y_true, y_pred)
+recall = recall_score(y_true, y_pred)
+print(f"Precision: {precision:.2f}")
+print(f"Recall: {recall:.2f}")
+

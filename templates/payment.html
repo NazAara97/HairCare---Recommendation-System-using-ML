@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='images/remedy7.png') }}");
+            background-size: cover;
+            font-family: Verdana, sans-serif;
+            color: #8B0000;
+        }
+        .container {
+            max-width: 500px;
+            margin-top: 100px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px 2px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: rgb(217, 28, 28);
+        }
+        .form-control {
+            border: 2px solid #8B0000;
+            border-radius: 5px;
+        }
+        .btn-primary {
+            background-color: #d9a357;
+            border: 2px solid #8B0000;
+            color: rgb(92, 10, 10);
+            font-weight: bold;
+            transition: 0.4s;
+        }
+        .btn-primary:hover {
+            background-color: #8B0000;
+            color: white;
+        }
+        #message {
+            text-align: center;
+            color: red;
+        }
+        .payment-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .payment-option img {
+            width: 50px;
+            height: 30px;
+            margin-right: 10px;}
+
+            .form-label {
+    font-weight: bold;
+            }
+
+
+        
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Payment Information</h2>
+        <form id="payment-form">
+            <div class="mb-3">
+                <label for="payment-method" class="form-label">Select Payment Method</label>
+                <div>
+                    <label for="payment-method" class="form-label">Credit card</label>
+                    <!-- Credit Card Options -->
+                    <div class="payment-option">
+
+                        <input type="radio" name="payment_method" value="Credit Card - Visa" id="visa-card" required>
+                        <img src="{{ url_for('static', filename='images/visa.png') }}" alt="Visa">
+                        <label for="visa-card">Visa</label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" name="payment_method" value="Credit Card - MasterCard" id="mastercard-card">
+                        <img src="{{ url_for('static', filename='images/mastercard.avif') }}" alt="MasterCard">
+                        <label for="mastercard-card">MasterCard</label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" name="payment_method" value="Credit Card - American Express" id="amex-card">
+                        <img src="{{ url_for('static', filename='images/amex.png') }}" alt="American Express">
+                        <label for="amex-card">American Express</label>
+                    </div>
+                <div>
+                    <label for="payment-method" class="form-label">Debit card</label></div>
+
+                    <!-- Debit Card Options -->
+                    <div class="payment-option">
+                        <input type="radio" name="payment_method" value="Debit Card - Visa" id="visa-debit" required>
+                        <img src="{{ url_for('static', filename='images/visa-debit.png') }}" alt="Visa Debit">
+                        <label for="visa-debit">Visa Debit</label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" name="payment_method" value="Debit Card - MasterCard" id="mastercard-debit">
+                        <img src="{{ url_for('static', filename='images/master-debit.jpg') }}" alt="MasterCard Debit">
+                        <label for="mastercard-debit">MasterCard Debit</label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" name="payment_method" value="Debit Card - RuPay" id="rupay-card">
+                        <img src="{{ url_for('static', filename='images/debit-rupay.png') }}" alt="RuPay">
+                        <label for="rupay-card">RuPay</label>
+                    </div>
+                    <div>
+                        <label for="payment-method" class="form-label">UPI</label></div>
+
+                    <!-- UPI Options -->
+                    <div class="payment-option">
+                        <input type="radio" name="payment_method" value="UPI - Google Pay" id="google-pay" required>
+                        <img src="{{ url_for('static', filename='images/upi-google pay.avif') }}" alt="Google Pay">
+                        <label for="google-pay">Google Pay</label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" name="payment_method" value="UPI - PhonePe" id="phonepe">
+                        <img src="{{ url_for('static', filename='images/phonepe.png') }}" alt="PhonePe">
+                        <label for="phonepe">PhonePe</label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" name="payment_method" value="UPI - Paytm" id="paytm">
+                        <img src="{{ url_for('static', filename='images/paytm.webp') }}" alt="Paytm">
+                        <label for="paytm">Paytm</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="card" class="form-label">Card Number</label>
+                <input type="text" class="form-control" id="card" name="card" maxlength="16" required>
+            </div>
+            <div class="mb-3">
+                <label for="expiry" class="form-label">Expiry Date (MM/YY)</label>
+                <input type="text" class="form-control" id="expiry" name="expiry" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Payment</button>
+        </form>
+        <div id="message"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Check if the user has already made a payment
+            $.ajax({
+                url: 'http://127.0.0.1:5000/payment',
+                type: 'GET',
+                success: function(response) {
+                    if (response.redirect) {
+                        // Redirect user to professional advice if already paid
+                        window.location.href = response.redirect;
+                    }
+                }
+            });
+
+            $('#payment-form').on('submit', function(e) {
+                e.preventDefault();
+
+                const paymentMethod = $('input[name="payment_method"]:checked').val();
+                const cardNumber = $('#card').val();
+
+                // Validate card number
+                if (cardNumber.length !== 16 || !/^\d{16}$/.test(cardNumber)) {
+                    $('#message').html('<p class="text-danger">Card number must be exactly 16 digits</p>');
+                    return;
+                }
+
+                const paymentData = {
+                    payment_method: paymentMethod,
+                    card: cardNumber,
+                    expiry: $('#expiry').val(),
+                };
+
+                $.ajax({
+                    url: 'http://127.0.0.1:5000/payment',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(paymentData),
+                    success: function(response) {
+                        if (response.success) {
+                            $('#message').html('<p class="text-success">Payment processed successfully</p>');
+                            setTimeout(function() {
+                                window.location.href = response.redirect; // Redirect to professional advice page
+                            }, 2000);
+                        } else {
+                            $('#message').html('<p class="text-danger">' + response.error + '</p>');
+                        }
+                    },
+                    error: function() {
+                        $('#message').html('<p class="text-danger">Error during payment</p>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

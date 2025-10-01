@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
+    <title>Signup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='images/remedy7.png') }}");/* Use the same background image */
+            background-size: cover;
+            font-family: Verdana, sans-serif;
+            color: #8B0000;
+        }
+        .container {
+            max-width: 400px;
+            margin-top: 100px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px 2px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: rgb(217, 28, 28);
+        }
+        .form-control {
+            border: 2px solid #8B0000;
+            border-radius: 5px;
+            margin-bottom: 10px; /* Add some space between inputs */
+        }
+        .btn-primary {
+            background-color: #d9a357;
+            border: 2px solid #8B0000;
+            color: rgb(92, 10, 10);
+            font-weight: bold;
+            width: 100%; /* Full width for the button */
+            transition: 0.4s;
+        }
+        .btn-primary:hover {
+            background-color: #8B0000;
+            color: white;
+        }
+        #message {
+            text-align: center;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Signup</h2>
+        <form id="signupForm">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" placeholder="Username" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" placeholder="Email" required>  
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Sign Up</button>
+        </form>
+        <div id="message"></div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('#signupForm').on('submit', function(e) {
+                    e.preventDefault();  // Prevent form from refreshing the page
+
+                    const formData = {
+                        username: $('#username').val(),
+                        email: $('#email').val(),
+                        password: $('#password').val()
+                    };
+
+                    $.ajax({
+                        url: 'http://localhost:5000/signup',  // Flask backend URL
+                        type: 'POST',
+                        data: formData,
+                        success: function(response) {
+                            if (response.success) {
+                                // Redirect to login page
+                                window.location.href = '/login';  // Update to a relative URL
+                            } else {
+                                $('#message').html('<p class="text-danger">' + response.message + '</p>');
+                            }
+                        },
+                        error: function() {
+                            $('#message').html('<p class="text-danger">Error during signup</p>');
+                        }
+                    });
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

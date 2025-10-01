@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
+    <title>HairCare | Natural Hair Remedy Recommendation System</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css"
+    />
+    <style>
+      footer {
+        text-align: center;
+        padding: 3px;
+        background-color: rgb(71, 49, 6);
+        color: rgb(15, 13, 13);
+        font-family: 'Luminari';
+      }
+
+      body {
+        background-image: url("{{ url_for('static', filename='images/remedy7.png') }}");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .container {
+        margin-top: 50px;
+        padding: 40px;
+        background-color: #d2b48c; /* Light brown background */
+        background-image: url('path_to_light_brown_leaves_image.jpg'); /* Add your leaves image here */
+        background-repeat: no-repeat;
+        background-size: cover; /* Adjust the size of the leaves */
+        box-shadow: 5 0 100px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        width: 1200px;
+        font-family: 'Luminari';
+      }
+
+      h1 {
+        color: #dc2932;
+        font-size: 40px;
+        font-weight: bold;
+        margin-bottom: 50px;
+      }
+
+      form label {
+        color: #e02626ce;
+        font-weight: 600;
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+
+      form select {
+        background-color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        height: 35px;
+        margin-bottom: 30px;
+        padding: 0 20px;
+        width: 100px;
+      }
+
+      form input[type="checkbox"] {
+        display: none;
+      }
+
+      form input[type="checkbox"] + label {
+        background-color: #ffffff;
+        border: 2px solid #cb1625;
+        border-radius: 10px;
+        color: #d62323;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 400;
+        margin-right: 10px;
+        padding: 5px 5px;
+        transition: all 0.3s ease-in-out;
+        width: 120px;
+        height: 30px;
+      }
+
+      form input[type="checkbox"]:checked + label {
+        background-color: #d1232b;
+        border-color: #da2225;
+        color: #101001;
+        width: 120px;
+        height: 30px;
+      }
+
+      form button {
+        background-color: #e1de34;
+        border: none;
+        border-radius: 10px;
+        color: #bd1627;
+        cursor: pointer;
+        font-size: 20px;
+        font-weight: 600;
+        height: 40px;
+        margin-top: 40px;
+        transition: all 0.3s ease-in-out;
+        width: 100px;
+        position: absolute;
+        top: 100%;
+        left: 45%;
+      }
+
+      .condition {
+        float: left;
+        padding-left: 20px;
+      }
+
+      .mt-5 {
+        margin-top: 100px;
+        height: auto;
+        width: 1100px;
+        font-size: 14px;
+        text-align: justify;
+        text-justify: inter-word;
+        color: #000000;
+        text-decoration: none;
+      }
+
+      .column-2 {
+        float: left;
+        width: 100%;
+        padding: 70px;
+        padding-top: 100px;
+        height: 600px;
+        background-image: url(remedy7.jpg);
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover; /* Should be removed. Only for demonstration */
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      .row:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+
+      #column-1-remedy {
+        font-size: 60px;
+        color: rgb(217, 28, 28);
+        text-align: center;
+        text-decoration: solid;
+        font-family: 'Luminari';
+        padding-top: 30px;
+      }
+
+      #column-1-des {
+        text-align: center;
+        font-family: 'Luminari';
+        font-size: 30px;
+        font-weight: bold;
+      }
+
+      #column-1-des-1 {
+        text-align: center;
+        font-size: 18px;
+        font-family: 'Luminari';
+        font-weight: bold;
+      }
+
+      #myChart {
+        width: 3%;
+        height: 3%;
+        font-weight: bold;
+      }
+
+      .pie {
+        background-color: rgb(216, 218, 208);
+        width: 1050px;
+        padding: 20px;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        font-weight: bold;
+      }
+
+      #review {
+        font-size: large;
+        text-align: center;
+      }
+
+      .draw {
+        width: 300px;
+        height: 300px;
+        position: absolute;
+        left: 800px;
+        top: 1050px;
+      }
+
+      #nameSelectedRemedy {
+        color: rgb(197, 19, 19);
+        text-align: center;
+        font-size: 25px;
+        padding-bottom: 5px;
+      }
+
+      .ingredient {
+        background-color: rgb(216, 218, 208);
+        width: 1050px;
+        padding: 20px;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg  text-white">
+      <div class="container-fluid">
+        <a class="navbar-brand text-black" href="/Home">HairCare</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto ">
+            <li class="nav-item ">
+              <a class="nav-link text-black" href="/Home">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-black" href="/About">About</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="row">
+      <div class="column-1">
+        <p id="column-1-remedy">Welcome to HairCare</p>
+        <p id="column-1-des">"Discover the power of nature with our home remedies for natural beauty. Transform your hair with simple, effective, and chemical-free solutions."</p>
+        <p id="column-1-des-1">Welcome to the realm of natural hair care, where the keys to healthy hair and shiny & silky hair may be found in the elements of the natural world itself. Indulge in the pampering of a hair day without leaving your house with our natural hair care home treatments, which have been formulated to maximize the benefits of organic ingredients. Plants and herbs have healing properties that can't be matched by synthetic compounds. Our natural hair masks and serums will help your skin retain its natural moisture and radiance for a more healthy hair. So, please in and experience the enchantment of our natural surroundings.</p>
+      </div>
+    </div>
+
+    <div class="container">
+      Welcome to our website! We are a team of passionate hair care enthusiasts who are dedicated to providing personalized hair remedies based on your unique hair conditions and remedy preferences. With our state-of-the-art search engine, you can easily search for remedies based on ingredients and browse through YouTube video reviews, expertly dissected into positive and negative feedback, to help you make informed decisions about the validity of each remedy. Our website was born out of the vision of Nazhath Aara, an undergraduate student at the University of Moratuwa, who created this platform as her final year project. We hope you enjoy exploring our website and finding the perfect remedy for your hair care needs!
+    </div>
+
+    <br>
+    <br>
+    
+  </body>
+</html>

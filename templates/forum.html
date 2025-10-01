@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='images/remedy7.png') }}");
+            background-size: cover;
+            font-family: Verdana, sans-serif;
+            color: #8B0000;
+        }
+        .container {
+            max-width: 900px;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px 2px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: rgb(217, 28, 28);
+        }
+        .card {
+            border: none;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+        }
+        .card-body {
+            padding: 15px;
+        }
+        .card-title {
+            color: #8B0000;
+        }
+        .btn-primary {
+            background-color: #d9a357;
+            border: 2px solid #8B0000;
+            color: rgb(92, 10, 10);
+            font-weight: bold;
+            transition: 0.4s;
+        }
+        .btn-primary:hover {
+            background-color: #8B0000;
+            color: white;
+        }
+        .btn-warning, .btn-danger {
+            border-radius: 5px;
+        }
+        .btn-sm {
+            font-size: 0.875rem;
+        }
+        .text-muted {
+            color: #6c757d !important;
+        }
+        .input-group {
+            margin-top: 10px;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg ">
+        <div class="container-fluid">
+            <a class="navbar-brand text-black" href="/Home">HairCare</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-black" href="/Home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-black" href="/About">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-black" href="/thankyou" id="logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+<div class="container mt-4">
+    <h1 class="mb-4">Forum</h1>
+
+    <!-- New Post Form (Visible to Logged-In Users) -->
+    {% if session.is_admin or session.username  %}
+    <div class="mb-4">
+        <h3>Create a New Post</h3>
+        <form id="new-post-form">
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" id="title" name="title" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="content" class="form-label">Content</label>
+                <textarea id="content" name="content" class="form-control" rows="3" required></textarea>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="addPost()">Add Post</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Forum Posts -->
+    <div>
+        {% for post in posts %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">{{ post.title }}</h5>
+                <p class="card-text">{{ post.content }}</p>
+                <p class="text-muted">Posted by: {{ post.author }}</p>
+
+                <!-- Post Action Buttons (Admin or Post Owner) -->
+                {% if session.is_admin or session.username == post.author %}
+                <button class="btn btn-warning btn-sm" onclick="editPost('{{ post._id }}')">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deletePost('{{ post._id }}')">Delete</button>
+                {% endif %}
+                
+            </div>
+            <div class="card-footer">
+                <h6>Replies</h6>
+                <div>
+                    {% for reply in post.replies %}
+                    <div class="mb-2">
+                        <p><strong>{{ reply.author }}:</strong> {{ reply.content }}</p>
+
+                        <!-- Reply Action Buttons (Admin can delete all replies, non-admin users can edit or delete their own) -->
+                        {% if session.is_admin %}
+                        <button class="btn btn-sm btn-warning" onclick="editReply('{{ post._id }}', '{{ reply.id }}')">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteReply('{{ post._id }}', '{{ reply.id }}')">Delete</button>
+                        {% elif session.username == reply.author %}
+                        <button class="btn btn-sm btn-warning" onclick="editReply('{{ post._id }}', '{{ reply.id }}')">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteReply('{{ post._id }}', '{{ reply.id }}')">Delete</button>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Reply Form (Visible to Logged-In Users) -->
+                {% if session.is_admin or session.username  %}
+                <form id="reply-form-{{ post._id }}" class="mt-2">
+                    <div class="input-group">
+                        <input type="text" id="reply-content-{{ post._id }}" class="form-control" placeholder="Add a reply...">
+                        <button type="button" class="btn btn-primary" onclick="addReply('{{ post._id }}')">Reply</button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function addPost() {
+        const title = document.getElementById('title').value;
+        const content = document.getElementById('content').value;
+
+        fetch('/add_post', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, content }),
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error adding post');
+            }
+        });
+    }
+
+    function editPost(postId) {
+        const newContent = prompt("Edit your post:");
+        if (newContent) {
+            fetch(`/edit_post/${postId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ new_content: newContent }),
+            }).then(() => location.reload());
+        }
+    }
+
+    function deletePost(postId) {
+        if (confirm("Are you sure you want to delete this post?")) {
+            fetch(`/delete_post/${postId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+            }).then(() => location.reload());
+        }
+    }
+
+    function addReply(postId) {
+        const replyContent = document.getElementById(`reply-content-${postId}`).value;
+
+        fetch(`/add_reply/${postId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reply_content: replyContent }),
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error adding reply');
+            }
+        });
+    }
+
+    function editReply(postId, replyId) {
+        const newReplyContent = prompt("Edit your reply:");
+        if (newReplyContent) {
+            fetch(`/edit_reply/${postId}/${replyId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ new_reply_content: newReplyContent }),
+            }).then(() => location.reload());
+        }
+    }
+
+    function deleteReply(postId, replyId) {
+        if (confirm("Are you sure you want to delete this reply?")) {
+            fetch(`/delete_reply/${postId}/${replyId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+            }).then(() => location.reload());
+        }
+    }
+</script>
+</body>
+</html>

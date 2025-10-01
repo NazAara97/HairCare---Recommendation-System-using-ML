@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>HairCare | Natural Hair Remedy Recommendation System</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css"
+    />
+    <style>
+     
+     footer {
+  text-align: center;
+  padding: 3px;
+  background-color: #d9a357;
+  color: rgb(59, 5, 5);
+  font-family: 'Luminari';
+
+}
+      body {
+        background-image: url("{{ url_for('static', filename='images/remedy7.png') }}");
+        background-size: cover;
+        background-position: center ;
+      }
+
+      .container {
+        margin-top: 50px;
+        padding: 40px;
+        background-color: #f0cd9b;
+        box-shadow: 5 0 100px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        width: 1200px;
+        font-family: 'Luminari';
+        border:  rgb(34, 18, 1);
+        border-radius: 10px;
+
+      }
+      .form-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh; /* This makes the form fill the height of the viewport */
+  }
+
+  
+   
+  
+      h1 {
+        color: #dc2932;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 50px;
+      }
+
+      form label {
+        color: #dc2932;
+        font-weight: 600;
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+
+      form select {
+        background-color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        height: 35px;
+        margin-bottom: 30px;
+        padding: 0 20px;
+        width: 100px;
+      }
+
+      form input[type="checkbox"] {
+        display: none;
+        
+      }
+
+      form input[type="checkbox"] + label {
+        background-color: #ffffff;
+        border: 2px solid #970904;
+        border-radius: 10px;
+        color: #dc2932;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 400;
+        margin-right: 10px;
+        padding: 5px 5px;
+        transition: all 0.3s ease-in-out;
+        width: 120px;
+        height: 30px;
+      }
+
+      form input[type="checkbox"]:checked + label {
+        background-color: #949d92;
+        border-color: #3a802c;
+        color: #dc2932;
+        width: 120px;
+        height: 30px;
+      }
+
+      form button {
+        background-color: #dc2932; /* Red color */
+       border: none;
+  border-radius: 10px;
+  color: white; /* White text */
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 600;
+  height: 40px;
+  margin-top: 40px;
+  width: 120px;
+  /* Remove absolute positioning */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+        
+      }
+
+      .condition{
+        float: left;
+        padding-left: 20px;
+        margin-bottom: 20px;
+      }
+    
+      .mt-5{
+        margin-top: 100px;
+        height: auto;
+        width: 1100px;
+        font-size: 14px;
+        text-align: justify;
+        text-justify: inter-word;
+        color: #000000;
+        margin-top: 100px;
+        text-decoration:none
+      }
+      .column-2 {
+  float: left;
+  width: 100%;
+  padding: 70px;
+  padding-top: 100px;
+  height: 600px;
+  background-image: url(remedy7.jpg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover; /* Should be removed. Only for demonstration */
+  font-size: 13px;
+}
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}#column-1-remedy{
+  font-size: 50px;
+  color: #dc2932;
+  text-align: center;
+  text-decoration: solid;
+  font-family: 'Luminari';
+  padding-top: 30px;
+  font-weight: bold;
+}
+#column-1-des{
+  text-align: center;
+  font-family: 'Luminari';
+  font-weight:bold;
+  color: #8B0000
+  }  
+#column-1-des-1{
+  text-align: center;
+  font-size: 15px;
+  font-weight:bold;
+  font-family: 'Luminari';
+  color: #8B0000
+  
+}
+#myChart{
+  width: 2%;
+  height: 2%;
+}
+.bar{
+  background-color:rgb(216, 218, 208);
+  width: 1050px;
+  padding: 20px;
+  box-shadow:  rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+#review{
+  font-size: large;
+  text-align: center;
+  
+}
+.draw{
+  width: 800px;
+  height: 800px;
+  position: center;
+  left: 800px;
+  top: 1050px;
+}
+#nameSelectedRemedy{
+  color:  rgb(82, 56, 10);
+  text-align: center;
+  font-size: 25px;
+  padding-bottom: 5px;
+}
+.ingredient{
+  background-color:rgb(216, 218, 208);
+  width: 1050px;
+  padding: 20px;
+  box-shadow:  rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg ">
+      <div class="container-fluid">
+        <a class="navbar-brand text-black"  href="Home.html">HairCare</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto ">
+            <li class="nav-item ">
+              <a class="nav-link text-black" href="/Home">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-black" href="/About">About</a>
+            </li>
+          
+          </ul>
+          
+        </div>
+      </div>
+    </nav>
+    <div class="row">
+      <div class="column-1">
+        <p id="column-1-remedy">Greetings from HairCare!!!</p>
+        <p id="column-1-des">"With our at-home solutions for natural hair care, discover the power of nature. Use easy, efficient, and chemical-free hair transformation techniques."</p>
+        <p id="column-1-des-1"> We invite you to explore the world of natural hair care, where the components of nature itself hold the secrets to beautiful, shiny & silky hair. Enjoy a hair day of pampering without ever leaving your home with our line of natural hair care products, designed to bring out the best in organic ingredients. Natural substances just cannot compare to the therapeutic benefits of plants and herbs. Your hair will maintain its natural softness and hydration with the aid of our natural hair masks and serums, leading to healthier-looking hair. So please come inside and take in the magic of our surrounding environment.</p>
+      </div>
+    </div>
+    
+    <div class="container">
+    
+      <form id="recommendationForm" action="/recommend" method="POST">
+        <!-- Existing Remedy Type Field -->
+        <div class="form-group">
+          <label for="remedy-type">Remedy Type:</label>
+          <select class="form-control" id="remedy-type" name="remedy-type">
+            <option value="shampoo">Shampoo</option>
+            <option value="oil">Oil</option>
+            <option value="mask">Mask</option>
+            <option value="serum">Serum</option>
+            <option value="conditioner">Conditioner</option>
+            <option value="treatement">Treatement</option>
+            <!-- Add other remedy types as needed -->
+          </select>
+        </div>
+        <!-- New Age Group Field -->
+    <div class="form-group">
+      <label for="age-group">Age Group:</label>
+      <select class="form-control" id="age-group" name="age-group">
+        <option value="below 60">Below 60</option>
+        <option value="above 60">Above 60</option>
+      </select>
+    </div>
+    <!-- New Hair Type Field -->
+    <div class="form-group">
+      <label for="hair-type">Hair Type:</label>
+      <select class="form-control" id="hair-type" name="hair-type">
+        <option value="normal">Normal</option>
+        <option value="dry">Dry</option>
+        <option value="oily">Oily</option>
+        
+      </select>
+    </div>
+     <!-- New Environmental Condition Field -->
+     <div class="form-group">
+      <label for="environment-condition">Environmental Condition:</label>
+      <select class="form-control" id="environment-condition" name="environment-condition">
+        <option value="normal">Normal</option>
+        <option value="hot">Hot</option>
+        <option value="cold">Cold</option>
+       
+      </select>
+    </div>
+        <div class="form-group">
+          <label for="condition-types">Condition Types:</label>
+          <div>
+          
+             <div class="condition">
+            <input
+              type="checkbox"
+              id="dandruff"
+              name="condition-types"
+              value="dandruff"
+            />
+            <label for="dandruff">Dandruff</label>
+          </div>
+
+          <div class="condition">
+            <input
+              type="checkbox"
+              id="hair loss"
+              name="condition-types"
+              value="hair loss"
+            />
+            <label for="hair loss">Hair loss</label>
+          </div>
+          
+          <div class="condition">
+            <input
+              type="checkbox"
+              id="silky"
+              name="condition-types"
+              value="silky"
+            />
+            <label for="silky">silky</label>
+          </div>
+
+          <div class="condition">
+            <input
+              type="checkbox"
+              id="frizz"
+              name="condition-types"
+              value="frizz"
+            />
+            <label for="frizz">Frizz</label>
+          </div>
+
+          <div class="condition">
+            <input
+              type="checkbox"
+              id=" growth"
+              name="condition-types"
+              value=" growth"
+            />
+            <label for="growth">Growth</label>
+          </div>
+
+          <div class="condition">
+            <input
+              type="checkbox"
+              id="shine"
+              name="condition-types"
+              value="shine"
+            />
+            <label for="shine">Shine</label>
+          </div>
+
+          <div class="condition">
+            <input
+              type="checkbox"
+              id="moisturize"
+              name="condition-types"
+              value="moisturize"
+            />
+            <label for="moisturize">Moisturize</label>
+          </div>
+
+          <div class="condition">
+            <input
+              type="checkbox"
+              id="thinning"
+              name="condition-types"
+              value="thinning"
+            />
+            <label for="thinning">Thinning</label>
+          </div>
+
+          <div class="condition">
+            <input
+              type="checkbox"
+              id="split ends"
+              name="condition-types"
+              value="split ends"
+            />
+            <label for="split ends">Split ends</label>
+          </div>
+          <div class="condition">
+            <input
+              type="checkbox"
+              id="damaged"
+              name="condition-types"
+              value="damaged"
+            />
+            <label for="damaged">Damaged</label>
+          </div>
+          <div class="condition">
+            <input
+              type="checkbox"
+              id="dull"
+              name="condition-types"
+              value="dull"
+            />
+            <label for="dull">Dull</label>
+          </div>
+        
+          <div class="condition">
+            <input
+              type="checkbox"
+              id="light hair colour"
+              name="condition-types"
+              value="light hair colour"
+            />
+            <label for="light hair colour">Light hair colour</label>
+          </div>
+          
+          <div class="condition">
+            <input
+              type="checkbox"
+              id="premature grey"
+              name="condition-types"
+              value="premature grey"
+            />
+            <label for="premature grey">Premature grey</label>
+          </div>
+          <div class="condition">
+            <input
+              type="checkbox"
+              id="itchy scalp"
+              name="condition-types"
+              value="itchy scalp"
+            />
+            <label for="itchy scalp">Itchy scalp</label>
+          </div>
+          <div class="condition">
+            <input
+              type="checkbox"
+              id="cleanse"
+              name="condition-types"
+              value="cleanse"
+            />
+            <label for="cleanse">Cleanse</label>
+          </div>
+
+        <br><br><br><br><br><br><br><br><br><br>
+          <!-- Add other condition types as needed -->
+       
+        <div class="text-center">
+          <button type="submit"  style="background-color:#dc2932" class="btn btn-success">
+                       Recommend
+          </button>
+        </div>
+      </form>
+      <br><br>
+      
+      <div class="mt-5" id="recommendationResult">
+        <!-- Recommendation results will be displayed here -->
+        <canvas id="myChart"></canvas>
+
+      </div>
+      
+    </div>
+
+    <script>
+
+
+
+      const conditionCheckboxes = document.querySelectorAll('input[name="condition-types"]');
+let numChecked = 0;
+
+conditionCheckboxes.forEach(checkbox => {
+  // use the event lisner to get the remedy
+  checkbox.addEventListener('click', () => {
+    if (checkbox.checked) {
+      numChecked++;
+      if (numChecked >= 3) {
+        conditionCheckboxes.forEach(cb => {
+          if (!cb.checked) {
+            cb.disabled = true;
+          }
+        });
+      }
+    } else {
+      numChecked--;
+      conditionCheckboxes.forEach(cb => {
+        cb.disabled = false;
+      });
+    }
+  });
+});
+
+    $(document).ready(function () {
+
+  $('#recommendationForm').submit(function (e) {
+    // Prevent default form submission 
+    e.preventDefault();
+
+    // Get the form data
+    var formData = $(this).serialize();
+
+    // send the request which is POST
+    $.post('http://127.0.0.1:5000/recommend', formData)
+      .done(function (response) {
+        // Display recommendation results
+        console.log(response);
+        //make a varibel to show the results 
+        var resultHtml = '';
+        response.forEach(function (item, index) {
+          resultHtml +=  (index + 1)+') ' + '  <a href="RemedyPage.html?name=' + item + '">' + item + '</a><br>';
+        });
+        // section to show the message 
+        
+        $('#recommendationResult').html(resultHtml);
+
+      })
+      .fail(function (error) {
+        // Display error message
+        $('#recommendationResult').html('<p> Since the dataset is limited . theres no remedy for your condition</p>');
+      });
+  });
+});
+
+$(document).on('click', '#recommendationResult a', function (e) {
+  e.preventDefault();
+
+  var itemName = $(this).text().trim();
+  $.get('http://localhost:5000/search-remedies', { name: itemName })
+    .done(function (data) {
+      console.log("Data received from backend:", data);
+
+      // Remedy fields from the backend response
+      var remedy = JSON.parse(data);  // Parse JSON string to object
+      var name = remedy.name || 'N/A';
+      var environ_condition = remedy.environ_condition || 'N/A';
+      var ingredients = remedy.ingredients || [];
+      var posreview = remedy.positiveRev || [];
+      var negreview = remedy.negativeRev || [];
+      var process = remedy.process || 'N/A';
+
+      // Format positive reviews
+      var posReviewsHtml = '<ul>';
+      posreview.forEach(function (review) {
+        posReviewsHtml += '<li>' + review + '</li>';
+      });
+      posReviewsHtml += '</ul>';
+
+      // Format negative reviews
+      var negReviewsHtml = '<ul>';
+      negreview.forEach(function (review) {
+        negReviewsHtml += '<li>' + review + '</li>';
+      });
+      negReviewsHtml += '</ul>';
+
+      // Format ingredients
+      var ingredientsHtml = '<ul>';
+      ingredients.forEach(function (ingredient) {
+        ingredientsHtml += '<li>' + ingredient + '</li>';
+      });
+      ingredientsHtml += '</ul>';
+
+      // Calculate review percentages
+      var totalReviews = posreview.length + negreview.length;
+      var posReviewPercentage = totalReviews > 0 ? (posreview.length / totalReviews) * 100 : 0;
+      var negReviewPercentage = totalReviews > 0 ? (negreview.length / totalReviews) * 100 : 0;
+
+      // Update recommendation result element with fields
+      var resultHtml = 
+        '<p id="nameSelectedRemedy"><strong> |' + name + '|</strong></p>' +
+        '<div class="ingredient"><p><strong>Ingredients:</strong> ' + ingredientsHtml + '</p>' +
+        '<p><strong>environment condition:</strong> ' + environ_condition + '</p>' +
+        '<p><strong>Process:</strong> ' + process + '</p></div> <br>' +
+        '<div class="pie"><p id="review">Review Details</strong></p>' +
+        '<p><strong>Positive Reviews:</strong> ' + posReviewsHtml + '</p>' +
+        '<p><strong>Negative Reviews:</strong> ' + negReviewsHtml + '</p>' +
+        '<p><strong>Percentage of Positive Reviews:</strong> ' + posReviewPercentage.toFixed(2) + '%</p>' +
+        '<p><strong>Percentage of Negative Reviews:</strong> ' + negReviewPercentage.toFixed(2) + '%</p></div>' +
+        '<br>' +
+        '<div class="draw"><canvas id="myChart"></canvas></div>';
+
+      $('#recommendationResult').html(resultHtml);
+
+      // Chart.js pie chart
+      var ctx = document.getElementById('myChart').getContext('2d');
+      var chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Positive Reviews', 'Negative Reviews'],
+          datasets: [{
+            
+            backgroundColor: ['#2ecc71', '#e74c3c'],
+            data: [posReviewPercentage, negReviewPercentage]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          scales: {
+          y: {
+          beginAtZero: true // Ensures the y-axis starts from zero
+           }
+    }
+        }
+      });
+    })
+    .fail(function (xhr, status, error) {
+      console.error("Error:", error);
+    });
+});
+
+
+
+  
+  
+</script>
+    <br>
+    <br>
+     
+  </body>
+</html>

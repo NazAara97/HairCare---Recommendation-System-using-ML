@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Verdana, sans-serif;
+            background-image: url("{{ url_for('static', filename='images/remedy7.png') }}");
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        #welcome-section {
+            text-align: center;
+            padding: 50px 0;
+            color: #ffffff;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        #welcome-section h1 {
+            font-size: 50px;
+            font-weight: bold;
+        }
+
+        #welcome-section p {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            padding: 50px 0;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 24px;
+            color: #d91c1c;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .card-text {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .button1 {
+            background-color: #d9a357;
+            border: none;
+            font-weight: bold;
+            color: rgb(92, 10, 10);
+            padding: 10px 20px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .button1:hover {
+            background-color: rgb(173, 17, 9);
+            color: white;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #d9a357;
+            color: rgb(97, 13, 8);
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand text-black" href="/Home">HairCare</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-black" href="/Home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-black" href="/About">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-black" href="/thankyou" id="logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<section id="welcome-section">
+    <h1>Welcome to HairCare</h1>
+    <p>"Unleash the secrets of natural remedies for healthier, shinier, and stronger hair."</p>
+</section>
+
+<div class="container mt-5">
+    <div class="row d-flex">
+        <!-- General Recommendation - DIY Remedies -->
+        <div class="col-md-4 d-flex align-items-stretch">
+            <div class="card">
+                <img src="{{ url_for('static', filename='images/remedy3.jpg') }}" alt="DIY Remedies" class="card-img-top">
+                <div class="card-body">
+                    <h2 class="card-title">General Recommendation - DIY Remedies</h2>
+                    <p class="card-text">Learn easy DIY recipes to create natural hair care products at home.</p>
+                    <a href="/index" class="button1">Recommend</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- General Recommendation - Search by Ingredient -->
+        <div class="col-md-4 d-flex align-items-stretch">
+            <div class="card">
+                <img src="{{ url_for('static', filename='images/remedy1.jpg') }}" alt="General Recommendation" class="card-img-top">
+                <div class="card-body">
+                    <h2 class="card-title">General Recommendation - Search by Ingredient</h2>
+                    <p class="card-text">Explore natural remedies tailored for your hair by searching ingredient.</p>
+                    <a href="/RemedyPage" class="button1">Search</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Professional Advice - Chatbot -->
+        <div class="col-md-4 d-flex align-items-stretch">
+            <div class="card">
+                <img src="{{ url_for('static', filename='images/remedy2.webp') }}" alt="Professional Advice" class="card-img-top">
+                <div class="card-body">
+                    <h2 class="card-title">Professional Advice - Chatbot</h2>
+                    <p class="card-text"><strong>Payment is required for new users</strong></p>
+                    <p class="card-text">Get expert-recommended remedies for hair problems.</p>
+                    <a href="/ayurveda_advice" class="button1">Get Advice</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<footer>
+    <p><strong> Have a Great Day and Nourish through Natural Ingredients!!!!!</strong> <br>
+  
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/js/bootstrap.min.js"></script>
+</body>
+</html>

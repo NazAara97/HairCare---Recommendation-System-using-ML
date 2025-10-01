@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayurvedic Hair Care Advice with Doctors</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Verdana, sans-serif;
+            background-image: url("{{ url_for('static', filename='images/remedy7.png') }}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            padding: 20px;
+            color: rgb(92, 10, 10);
+        }
+
+        .chatbox {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        .chatbox input, .chatbox button {
+            padding: 12px;
+            width: 100%;
+            margin-bottom: 12px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+        }
+
+        .chatbox button {
+            background-color: #d9a357;
+            border: 2px solid rgb(173, 17, 9);
+            font-weight: bold;
+            color: rgb(92, 10, 10);
+            cursor: pointer;
+            transition-duration: 0.4s;
+        }
+
+        .chatbox button:hover {
+            background-color: rgb(173, 17, 9);
+            color: white;
+        }
+
+        .chatbox .message {
+            margin-bottom: 12px;
+        }
+
+        .chatbox .message.bot {
+            color: rgb(146, 60, 23);
+        }
+
+        .chatbox .message.user {
+            color: black;
+        }
+
+        .chatbox .message.doctor {
+            color: rgb(51, 30, 5);
+            font-weight: bold;
+        }
+
+        .btn-custom {
+            background-color: rgb(173, 17, 9);
+            color: white;
+        }
+
+        h2 {
+            text-align: center;
+            font-family: 'Luminari', serif;
+            color: rgb(217, 28, 28);
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn-custom-disabled {
+            background-color: #8B0000;
+            color: white;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+        <a class="navbar-brand text-black" href="/Home">HairCare</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-black" href="/Home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-black" href="/About">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-black" href="/thankyou">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="chatbox">
+    <h2>Ayurvedic Hair Care Advice</h2>
+    <div id="chat-messages"></div>
+    <input type="text" id="condition-input" placeholder="Enter your hair condition (e.g. dandruff, hair fall)...">
+    <button id="ask-button" onclick="getAdvice()">Ask for Ayurvedic Advice</button>
+</div>
+
+<!-- Button Container -->
+<div class="button-container">
+    <button id="payment-button" class="btn btn-custom" onclick="checkPaymentStatus()">Proceed to Payment</button>
+</div>
+
+<!-- New Button for Paid Users -->
+<div class="button-container" id="professional-advice-button-container" style="display: none;">
+    <button id="professional-advice-button" class="btn btn-custom" onclick="redirectToProfessionalAdvice()">Go to Professional Advice</button>
+</div>
+
+<script>
+    let queryCount = 0;
+    const maxQueries = 1; // Reduced to 1
+
+    // Function to check the payment status when the page is loaded
+    function checkPaymentStatus() {
+        $.ajax({
+            url: 'http://127.0.0.1:5000/check_payment_status', // Endpoint to check payment status
+            type: 'GET',
+            success: function(response) {
+                if (response.paid) {
+                    // If the user has paid, show the professional advice button
+                    $("#professional-advice-button-container").show();
+                    disablePaymentButton();
+                } else {
+                    // If the user has not paid, redirect to the payment page
+                    window.location.href = "/payment";
+                }
+            },
+            error: function() {
+                alert('Error checking payment status');
+            }
+        });
+    }
+
+    function getAdvice() {
+        const condition = $("#condition-input").val().trim();
+
+        if (condition && queryCount < maxQueries) {
+            queryCount++;
+            
+            $.ajax({
+                url: "http://127.0.0.1:5000/get_advice",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ condition: condition }),
+                success: function(response) {
+                    $("#chat-messages").append('<div class="message user">You: ' + condition + '</div>');
+                    $("#chat-messages").append('<div class="message bot">Advice: ' + response.advice + '</div>');
+                    if (response.doctor) {
+                        $("#chat-messages").append('<div class="message doctor">Doctor: ' + response.doctor + '</div>');
+                    }
+                    $("#condition-input").val(''); 
+                },
+                error: function() {
+                    $("#chat-messages").append('<div class="message bot">Error retrieving advice</div>');
+                }
+            });
+        }
+
+        if (queryCount >= maxQueries) {
+            $("#chat-messages").append('<div class="message bot">Please proceed with payment for further detailed advice.</div>');
+            $("#condition-input").prop('disabled', true);
+            $("#ask-button").prop('disabled', true);
+        }
+    }
+
+    // Disable the payment button if the user has already paid
+    function disablePaymentButton() {
+        $("#payment-button").addClass('btn-custom-disabled').text("Already Paid");
+        $("#payment-button").prop('disabled', true);
+    }
+
+    // Redirect to professional_advice.html
+    function redirectToProfessionalAdvice() {
+        window.location.href = "/professional_advice";
+    }
+
+    $(document).ready(function() {
+        // Check payment status on page load
+        $.ajax({
+            url: 'http://127.0.0.1:5000/check_payment_status',
+            type: 'GET',
+            success: function(response) {
+                if (response.paid) {
+                    $("#professional-advice-button-container").show();
+                    disablePaymentButton();
+                }
+            },
+            error: function() {
+                console.log('Error checking payment status');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
